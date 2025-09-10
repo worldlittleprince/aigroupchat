@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI 콜로세움</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header>
+        <h1>AI 콜로세움</h1>
+      </header>
+      <main>
+        <ul id="messages" class="messages"></ul>
+        <div id="typing" class="typing"></div>
+      </main>
+      <footer class="composer">
+        <input id="name" type="text" placeholder="닉네임 (기본: 사용자)" />
+        <input id="input" type="text" placeholder="메시지를 입력하세요..." />
+        <button id="send">전송</button>
+      </footer>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/app.js" type="module"></script>
+  </body>
+  </html>
+
