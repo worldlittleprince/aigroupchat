@@ -9,6 +9,8 @@ export class AgentPool {
   constructor({ broadcaster, providerFactory }) {
     this.broadcaster = broadcaster;
     const envProvider = (process.env.LLM_PROVIDER || 'mock').toLowerCase();
+    const enabledList = (process.env.AGENTS_ENABLED || '').split(/[,\s]+/).map(s => s.trim()).filter(Boolean);
+    const disabledList = (process.env.AGENTS_DISABLED || '').split(/[,\s]+/).map(s => s.trim()).filter(Boolean);
     this.providerFactory = providerFactory || ((persona) => {
       if (envProvider === 'openai') {
         try {
@@ -33,7 +35,16 @@ export class AgentPool {
       }
       return new MockProvider();
     });
-    this.agents = personas.map(p => new Agent({
+    let selected = personas;
+    if (enabledList.length) {
+      const aSet = new Set(enabledList);
+      selected = personas.filter(p => aSet.has(p.id));
+    }
+    if (disabledList.length) {
+      const dSet = new Set(disabledList);
+      selected = selected.filter(p => !dSet.has(p.id));
+    }
+    this.agents = selected.map(p => new Agent({
       id: p.id,
       displayName: p.displayName,
       systemPrompt: p.systemPrompt,
@@ -42,8 +53,8 @@ export class AgentPool {
     }));
   }
 
-  async handleBroadcast(history, lastMessage) {
+  async handleBroadcast(roomId, history, lastMessage) {
     // Fan out concurrently
-    await Promise.allSettled(this.agents.map(a => a.onBroadcast(history, lastMessage)));
+    await Promise.allSettled(this.agents.map(a => a.onBroadcast(roomId, history, lastMessage)));
   }
 }

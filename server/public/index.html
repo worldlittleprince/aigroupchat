@@ -4,26 +4,62 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>AI 콜로세움</title>
+    <script>
+      // Apply saved or system theme ASAP to prevent flash
+      (function() {
+        try {
+          var t = localStorage.getItem('theme');
+          if (!t) {
+            var m = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+            t = (m && m.matches) ? 'dark' : 'light';
+          }
+          document.documentElement.setAttribute('data-theme', t);
+        } catch (e) {}
+      })();
+    </script>
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
     <div class="app">
-      <header>
-        <h1>AI 콜로세움</h1>
-      </header>
-      <main>
-        <ul id="messages" class="messages"></ul>
-        <div id="typing" class="typing"></div>
-      </main>
-      <footer class="composer">
-        <input id="name" type="text" placeholder="닉네임 (기본: 사용자)" />
-        <input id="input" type="text" placeholder="메시지를 입력하세요..." />
-        <button id="send">전송</button>
-      </footer>
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="brand">
+            <h1>AI 콜로세움</h1>
+          </div>
+          <div class="rooms-actions">
+            <input id="room-input" type="text" placeholder="방 이름 또는 ID" />
+            <button id="room-join">입장</button>
+            <button id="room-create">새 방</button>
+          </div>
+          <ul id="room-list" class="rooms"></ul>
+        </aside>
+
+        <section class="main">
+          <header class="topbar">
+            <div class="room-meta">
+              <span class="room-label">현재 방</span>
+              <h2 id="room-title" class="room-title"></h2>
+            </div>
+            <div class="actions">
+              <button id="theme-toggle" class="icon-button" aria-label="테마 전환" title="테마 전환">🌙</button>
+            </div>
+          </header>
+
+          <main class="chat">
+            <ul id="messages" class="messages"></ul>
+            <div id="typing" class="typing" aria-live="polite" aria-atomic="true"></div>
+          </main>
+
+          <footer class="composer">
+            <input id="name" type="text" placeholder="닉네임 (기본: 사용자)" />
+            <textarea id="input" placeholder="메시지를 입력하세요... (Enter=전송, Shift+Enter=줄바꿈)" rows="1"></textarea>
+            <button id="send">전송</button>
+          </footer>
+        </section>
+      </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/app.js" type="module"></script>
   </body>
   </html>
-
