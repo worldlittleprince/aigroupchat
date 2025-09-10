@@ -42,8 +42,26 @@
             </div>
             <div class="actions">
               <button id="theme-toggle" class="icon-button" aria-label="테마 전환" title="테마 전환">🌙</button>
+              <button id="settings-toggle" class="icon-button" aria-label="설정" title="설정">⚙️</button>
             </div>
           </header>
+
+          <div id="settings-panel" class="settings" hidden>
+            <div class="settings-row">
+              <strong>에이전트</strong>
+              <label><input type="checkbox" id="agent-alpha" checked /> 알파</label>
+              <label><input type="checkbox" id="agent-muse" checked /> 뮤즈</label>
+              <label><input type="checkbox" id="agent-leo" checked /> 리오</label>
+            </div>
+            <div class="settings-row">
+              <strong>응답 빈도</strong>
+              <select id="response-density">
+                <option value="1.0">많음</option>
+                <option value="0.6" selected>보통</option>
+                <option value="0.3">적음</option>
+              </select>
+            </div>
+          </div>
 
           <main class="chat">
             <ul id="messages" class="messages"></ul>

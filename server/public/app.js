@@ -20,6 +20,12 @@ const $roomJoin = document.getElementById('room-join');
 const $roomCreate = document.getElementById('room-create');
 const $roomList = document.getElementById('room-list');
 const $themeToggle = document.getElementById('theme-toggle');
+const $settingsToggle = document.getElementById('settings-toggle');
+const $settingsPanel = document.getElementById('settings-panel');
+const $agentAlpha = document.getElementById('agent-alpha');
+const $agentMuse = document.getElementById('agent-muse');
+const $agentLeo = document.getElementById('agent-leo');
+const $responseDensity = document.getElementById('response-density');
 
 const typingMap = new Map(); // agentId -> displayName
 
@@ -344,4 +350,59 @@ fetchRooms();
       mm.addListener && mm.addListener(() => { if (!getStored()) applyTheme(undefined, false); });
     }
   }
+})();
+
+// Settings (P1): fetch/apply per-room config and allow updates
+(function settingsInit() {
+  if (!$settingsToggle || !$settingsPanel) return;
+  let current = null;
+
+  function applyUI(cfg) {
+    try {
+      if (!cfg) return;
+      current = cfg;
+      if ($agentAlpha) $agentAlpha.checked = cfg.agentEnabled?.alpha !== false;
+      if ($agentMuse) $agentMuse.checked = cfg.agentEnabled?.muse !== false;
+      if ($agentLeo) $agentLeo.checked = cfg.agentEnabled?.leo !== false;
+      if ($responseDensity) $responseDensity.value = String(cfg.responseProbability ?? 1.0);
+    } catch {}
+  }
+
+  async function fetchConfig() {
+    try {
+      const res = await fetch(`/rooms/${encodeURIComponent(ROOM_ID)}/config`);
+      if (!res.ok) return;
+      const data = await res.json();
+      applyUI(data.config);
+    } catch {}
+  }
+
+  async function postConfig(partial) {
+    try {
+      const res = await fetch(`/rooms/${encodeURIComponent(ROOM_ID)}/config`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(partial)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        applyUI(data.config);
+      }
+    } catch {}
+  }
+
+  $settingsToggle.addEventListener('click', () => {
+    const isHidden = $settingsPanel.hasAttribute('hidden');
+    if (isHidden) {
+      $settingsPanel.removeAttribute('hidden');
+      fetchConfig();
+    } else {
+      $settingsPanel.setAttribute('hidden', '');
+    }
+  });
+
+  if ($agentAlpha) $agentAlpha.addEventListener('change', () => postConfig({ agentEnabled: { alpha: $agentAlpha.checked } }));
+  if ($agentMuse) $agentMuse.addEventListener('change', () => postConfig({ agentEnabled: { muse: $agentMuse.checked } }));
+  if ($agentLeo) $agentLeo.addEventListener('change', () => postConfig({ agentEnabled: { leo: $agentLeo.checked } }));
+  if ($responseDensity) $responseDensity.addEventListener('change', () => postConfig({ responseProbability: parseFloat($responseDensity.value) }));
 })();

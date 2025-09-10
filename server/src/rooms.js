@@ -2,7 +2,14 @@ import { ConversationHistory } from './history.js';
 
 export class RoomManager {
   constructor() {
-    this.rooms = new Map(); // roomId -> { history: ConversationHistory, participants: Set<string>, lastActivity: number }
+    this.rooms = new Map(); // roomId -> { history, participants, lastActivity, config }
+  }
+
+  _defaultConfig() {
+    return {
+      agentEnabled: { alpha: true, muse: true, leo: true },
+      responseProbability: 1.0,
+    };
   }
 
   ensure(roomId) {
@@ -11,7 +18,8 @@ export class RoomManager {
       this.rooms.set(id, {
         history: new ConversationHistory(),
         participants: new Set(),
-        lastActivity: Date.now()
+        lastActivity: Date.now(),
+        config: this._defaultConfig()
       });
     }
     return this.rooms.get(id);
@@ -34,6 +42,21 @@ export class RoomManager {
   leave(roomId, socketId) {
     const r = this.ensure(roomId);
     r.participants.delete(socketId);
+  }
+
+  getConfig(roomId) {
+    return { ...this.ensure(roomId).config };
+  }
+
+  updateConfig(roomId, partial) {
+    const r = this.ensure(roomId);
+    r.config = {
+      ...r.config,
+      ...partial,
+      // deep-merge for agentEnabled if provided
+      agentEnabled: partial?.agentEnabled ? { ...r.config.agentEnabled, ...partial.agentEnabled } : r.config.agentEnabled
+    };
+    return this.getConfig(roomId);
   }
 
   list() {

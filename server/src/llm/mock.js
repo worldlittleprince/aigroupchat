@@ -42,7 +42,7 @@ export class MockProvider extends LLMProvider {
       return { noResponse: true };
     }
     const content = craftReply(persona, history);
-    return { content };
+    const maxChars = parseInt(process.env.AGENT_RESPONSE_MAX_CHARS || '100', 10);
+    return { content: content.slice(0, maxChars) };
   }
 }
-

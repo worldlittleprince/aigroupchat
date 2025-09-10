@@ -254,6 +254,19 @@ body, .sidebar, .topbar, .composer, .bubble, .rooms li, input[type="text"], text
   transition: background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease;
 }
 
+/* Settings panel */
+.settings {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-top: -4px;
+}
+.settings-row { display: flex; align-items: center; gap: 12px; margin: 6px 0; flex-wrap: wrap; }
+.settings strong { font-size: 13px; color: var(--muted); min-width: 72px; }
+.settings label { font-size: 13px; color: var(--text); }
+.settings select { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; }
+
 /* Responsive */
 @media (max-width: 900px) {
   .layout { grid-template-columns: 1fr; }
